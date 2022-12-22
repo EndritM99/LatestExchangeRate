@@ -11,13 +11,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
-
 // Add Hangfire services.
 builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
-.UseRecommendedSerializerSettings()
+    .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection"), new SqlServerStorageOptions
     {
         CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
@@ -28,6 +26,10 @@ builder.Services.AddHangfire(configuration => configuration
     }));
 
 // Add the processing server as IHostedService
+
+
+var app = builder.Build();
+
 builder.Services.AddHangfireServer();
 
 // Configure the HTTP request pipeline.
