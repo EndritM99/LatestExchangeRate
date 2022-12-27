@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LatestExchangeRate", "LatestExchangeRate\LatestExchangeRate.csproj", "{632DBDC8-B8B0-4CA0-9C13-E0469BE0157A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LatestExchangeRate", "LatestExchangeRate\LatestExchangeRate.csproj", "{632DBDC8-B8B0-4CA0-9C13-E0469BE0157A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExchangeRateDataProvider", "ExchangeRateDataProvider\ExchangeRateDataProvider.csproj", "{AF166713-3B65-430B-B0E3-00340975C55C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeRateUpdater", "LatestExchangeRateUpdater\ExchangeRateUpdater.csproj", "{38204229-9EA5-4065-9BB4-5C12811B2089}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{632DBDC8-B8B0-4CA0-9C13-E0469BE0157A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{632DBDC8-B8B0-4CA0-9C13-E0469BE0157A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{632DBDC8-B8B0-4CA0-9C13-E0469BE0157A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF166713-3B65-430B-B0E3-00340975C55C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF166713-3B65-430B-B0E3-00340975C55C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF166713-3B65-430B-B0E3-00340975C55C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF166713-3B65-430B-B0E3-00340975C55C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38204229-9EA5-4065-9BB4-5C12811B2089}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38204229-9EA5-4065-9BB4-5C12811B2089}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38204229-9EA5-4065-9BB4-5C12811B2089}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38204229-9EA5-4065-9BB4-5C12811B2089}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

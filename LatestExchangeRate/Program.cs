@@ -1,6 +1,9 @@
 using Hangfire;
 using Hangfire.SqlServer;
-using Microsoft.Extensions.Configuration;
+using LatestExchangeRate.Context;
+using LatestExchangeRate.Interfaces;
+using LatestExchangeRate.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +29,15 @@ builder.Services.AddHangfire(configuration => configuration
     }));
 
 // Add the processing server as IHostedService
+builder.Services.AddHangfireServer();
 
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Added dependencies here
+builder.Services.AddScoped<IJobScheduler, JobScheduler>();
+builder.Services.AddScoped<IExchangeRate, FixerService>();
 
 var app = builder.Build();
-
-builder.Services.AddHangfireServer();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -46,6 +53,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.UseHangfireDashboard();
+
 
 app.UseEndpoints(endpoints =>
 {
