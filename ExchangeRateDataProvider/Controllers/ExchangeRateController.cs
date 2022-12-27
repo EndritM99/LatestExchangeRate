@@ -16,9 +16,9 @@ namespace ExchangeRateDataProvider.Controllers
 
         [HttpGet]
         [Route("getlatestexchangerate")]
-        public ActionResult<FixerDataResponse> GetLatestExchangeRate()
+        public async Task<ActionResult<FixerDataResponse>> GetLatestExchangeRateAsync()
         {
-            var response = _repository.GetLatestExchangeRate();
+            var response = await _repository.GetLatestExchangeRate();
             if (response == null)
             {
                 return NotFound();

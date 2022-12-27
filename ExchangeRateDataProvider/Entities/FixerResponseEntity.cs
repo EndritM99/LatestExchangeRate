@@ -9,6 +9,6 @@ namespace ExchangeRateDataProvider.Entities
         public DateTime Date { get; set; }
         public bool Success { get; set; }
         public long Timestamp { get; set; }
-        public ICollection<CurrencyRate> CurrencyRates { get; set; }
+        public ICollection<CurrencyRate>? CurrencyRates { get; set; }
     }
 }

@@ -12,13 +12,5 @@ namespace ExchangeRateDataProvider.Context
 
         public DbSet<FixerResponseEntity> FixerResponses { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<FixerResponseEntity>()
-        //    .HasMany(r => r.CurrencyRates)
-        //    .WithOne(cr => cr.FixerResponseEntity)
-        //    .IsRequired();
-        //}
     }
 }

@@ -16,9 +16,9 @@ namespace ExchangeRateDataProvider.Repository
 
         public async Task<FixerDataResponse> GetLatestExchangeRate()
         {
-            var fixerResponse = await _context.FixerResponses
-                .OrderByDescending(r => r.Id)
-                .FirstOrDefaultAsync();
+            var fixerResponse = _context.FixerResponses
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefault();
 
             var currencyRates = await _context.CurrencyRates
                 .Where(cr => cr.FixerResponseEntityId == fixerResponse.Id)
