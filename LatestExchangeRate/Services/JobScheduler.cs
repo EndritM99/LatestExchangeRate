@@ -15,7 +15,7 @@ namespace LatestExchangeRate.Services
 
         public void EnqueueGetLatestExchangeRate(FixerRestClientRequest request)
         {
-            BackgroundJob.Enqueue(() => _fixerService.GetLatestExchangeRate(request));
+            RecurringJob.AddOrUpdate<IExchangeRate>(x => x.GetLatestExchangeRate(request), "*/10 * * * *");
         }
     }
 }

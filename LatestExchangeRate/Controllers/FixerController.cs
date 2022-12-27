@@ -15,7 +15,7 @@ namespace LatestExchangeRate.Controllers
 
         [HttpGet]
         [Route("latestexchangerate")]
-        public void LatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
+        public ActionResult LatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
         {
             if (fixerRestClientRequest == null)
             {
@@ -23,6 +23,8 @@ namespace LatestExchangeRate.Controllers
             }
 
             _jobScheduler.EnqueueGetLatestExchangeRate(fixerRestClientRequest);
+
+            return Ok();
         }
     }
 }
