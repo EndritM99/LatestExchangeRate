@@ -10,7 +10,7 @@ namespace LatestExchangeRate.Extensions
             var entity = new FixerResponseEntity
             {
                 Base = response.Base,
-                Date = response.Date.AddDays(1),
+                Date = response.Date,
                 Success = response.Success,
                 Timestamp = response.Timestamp
             };

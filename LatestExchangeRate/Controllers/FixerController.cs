@@ -21,10 +21,11 @@ namespace LatestExchangeRate.Controllers
         {
             if (fixerRestClientRequest == null)
             {
-                throw new Exception("Null Req");
+                throw new Exception("Request was null, please try again!");
             }
 
             var jobId = _jobScheduler.EnqueueGetLatestExchangeRate(fixerRestClientRequest);
+
             var connection = JobStorage.Current.GetConnection();
             var stateData = connection.GetStateData(jobId);
             var operationResponse = new OperationResponse();
