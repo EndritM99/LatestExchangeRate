@@ -16,22 +16,31 @@ namespace ExchangeRateDataProvider.Repository
 
         public async Task<FixerDataResponse> GetLatestExchangeRate()
         {
-            var fixerResponse = _context.FixerResponses
+            FixerDataResponse fixerDataResponse;
+            try
+            {
+                var fixerResponse = _context.FixerResponses
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
-            var currencyRates = await _context.CurrencyRates
-                .Where(cr => cr.FixerResponseEntityId == fixerResponse.Id)
-                .ToDictionaryAsync(cr => cr.CurrencyCode, cr => cr.Rate);
+                var currencyRates = await _context.CurrencyRates
+                    .Where(cr => cr.FixerResponseEntityId == fixerResponse.Id)
+                    .ToDictionaryAsync(cr => cr.CurrencyCode, cr => cr.Rate);
 
-            var fixerDataResponse = new FixerDataResponse
+                fixerDataResponse = new FixerDataResponse
+                {
+                    Base = fixerResponse.Base,
+                    Date = fixerResponse.Date,
+                    Rates = currencyRates,
+                    Success = fixerResponse.Success,
+                    Timestamp = fixerResponse.Timestamp
+                };
+            }
+            catch (Exception)
             {
-                Base = fixerResponse.Base,
-                Date = fixerResponse.Date,
-                Rates = currencyRates,
-                Success = fixerResponse.Success,
-                Timestamp = fixerResponse.Timestamp
-            };
+                fixerDataResponse = null;
+                throw new Exception($"Failed to retrive data from database");
+            }
 
             return fixerDataResponse;
         }

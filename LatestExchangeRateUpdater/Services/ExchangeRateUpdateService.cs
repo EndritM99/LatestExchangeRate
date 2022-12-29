@@ -11,29 +11,41 @@ namespace ExchangeRateUpdater.Services
     {
         public async Task<OperationResponse> ExchangeRateUpdateServiceAsync(LatestExchangeRateRequest latestExchangeRateRequest) 
         {
-            var client = new HttpClient();
+            var operationResponse = new OperationResponse();
 
-            client.BaseAddress = new Uri(ExchangeRateUpdaterConstants.BaseAddres);
-
-            var request = new HttpRequestMessage
+            try
             {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(ExchangeRateUpdaterConstants.EndpointToHit, UriKind.Relative)
-            };
+                var client = new HttpClient();
 
-            request.Content = new FormUrlEncodedContent(new[]
-            {
+                client.BaseAddress = new Uri(ExchangeRateUpdaterConstants.BaseAddres);
+
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(ExchangeRateUpdaterConstants.EndpointToHit, UriKind.Relative)
+                };
+
+                request.Content = new FormUrlEncodedContent(new[]
+                {
                 new KeyValuePair<string, string>("base", latestExchangeRateRequest?.Base),
                 new KeyValuePair<string, string>("symbols", latestExchangeRateRequest?.Symbols)
-            });
+                });
 
-            var response = await client.SendAsync(request);
+                var response = await client.SendAsync(request);
 
-            var responseContent = await response.Content.ReadAsStringAsync();
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-            var latestExchangeRateResponse = JsonConvert.DeserializeObject<OperationResponse>(responseContent);
+                operationResponse = JsonConvert.DeserializeObject<OperationResponse>(responseContent);
+            }
+            catch (Exception ex)
+            {
+                operationResponse.Success = false;
+                operationResponse.ErrorMessage = "An error occurred while processing the request. Please try again later";
 
-            return latestExchangeRateResponse;
+                throw new Exception(ex.Message);
+            }
+
+            return operationResponse;
         }
     }
 }

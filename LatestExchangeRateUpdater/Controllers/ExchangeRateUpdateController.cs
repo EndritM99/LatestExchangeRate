@@ -16,7 +16,8 @@ namespace ExchangeRateUpdater.Controllers
         [HttpGet]
         [Route("updatelatestexchange")]
         public async Task<ActionResult<OperationResponse>> UpdateLatestExchange(LatestExchangeRateRequest latestExchangeRateRequest)
-        {
+        { 
+            //Since the request can be null I'm not validating anything before calling the service :D
             var response = await _exchangeRateUpdate.ExchangeRateUpdateServiceAsync(latestExchangeRateRequest);
 
             if (response.Success == true)

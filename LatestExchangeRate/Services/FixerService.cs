@@ -6,6 +6,7 @@ using LatestExchangeRate.Context;
 using Newtonsoft.Json;
 using RestSharp;
 using Hangfire;
+using Azure;
 
 namespace LatestExchangeRate.Services
 {
@@ -20,32 +21,48 @@ namespace LatestExchangeRate.Services
 
         public void GetLatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
         {
-            if (fixerRestClientRequest == null)
+            try
             {
-                throw new Exception("...");
+                var client = new RestClient(RestClientConstants.BaseURL);
+                var request = new RestRequest(RestClientConstants.LatestRateEndpoint, Method.Get);
+
+                request.AddHeader("apikey", RestClientConstants.ApiKey);
+                request.AddParameter("symbols", fixerRestClientRequest.Symbols, ParameterType.QueryString);
+                request.AddParameter("base", fixerRestClientRequest.Base, ParameterType.QueryString);
+
+                var response = client.Execute(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = response.Content;
+                    var result = JsonConvert.DeserializeObject<FixerRestClientResponse>(jsonResponse);
+
+                    SaveResponseToDatabase(result);
+                }
+                else
+                {
+                    throw new Exception($"Error getting the response from RestClient. Status code: {response.StatusCode}");
+                }
             }
-
-            var client = new RestClient(RestClientConstants.BaseURL);
-            var request = new RestRequest(RestClientConstants.LatestRateEndpoint, Method.Get);
-
-            request.AddHeader("apikey", RestClientConstants.ApiKey);
-            request.AddParameter("symbols", fixerRestClientRequest.Symbols, ParameterType.QueryString);
-            request.AddParameter("base", fixerRestClientRequest.Base, ParameterType.QueryString);
-
-            var response = client.Execute(request);
-
-            var jsonResponse = response.Content;
-            var result = JsonConvert.DeserializeObject<FixerRestClientResponse>(jsonResponse);
-
-            SaveResponseToDatabase(result);
+            catch (Exception ex)
+            {
+                throw new Exception($"Error making request to RestClient. Status code: {ex.Message}");
+            }
         }
 
         public void SaveResponseToDatabase(FixerRestClientResponse response)
         {
-            var entity = response.ToEntity();
+            try
+            {
+                var entity = response.ToEntity();
 
-            _context.FixerResponses.Add(entity);
-            _context.SaveChanges();
+                _context.FixerResponses.Add(entity);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving response to database: {ex.Message}");
+            }
         }
     }
 }
