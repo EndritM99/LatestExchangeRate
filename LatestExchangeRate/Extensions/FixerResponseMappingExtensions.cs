@@ -7,7 +7,6 @@ namespace LatestExchangeRate.Extensions
     {
         public static FixerResponseEntity ToEntity(this FixerRestClientResponse response)
         {
-
             var entity = new FixerResponseEntity
             {
                 Base = response.Base,
