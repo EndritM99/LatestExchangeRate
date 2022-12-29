@@ -15,11 +15,18 @@ namespace ExchangeRateUpdater.Controllers
 
         [HttpGet]
         [Route("updatelatestexchange")]
-        public ActionResult<LatestExchangeRateResponse> UpdateLatestExchange(LatestExchangeRateRequest latestExchangeRateRequest)
+        public async Task<ActionResult<OperationResponse>> UpdateLatestExchange(LatestExchangeRateRequest latestExchangeRateRequest)
         {
-            var result = _exchangeRateUpdate.ExchangeRateUpdateServiceAsync(latestExchangeRateRequest);
+            var response = await _exchangeRateUpdate.ExchangeRateUpdateServiceAsync(latestExchangeRateRequest);
 
-            return Ok(result);
+            if (response.Success == true)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
+            }
         }
     }
 }

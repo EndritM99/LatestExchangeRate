@@ -1,4 +1,6 @@
-﻿using LatestExchangeRate.Interfaces;
+﻿using Hangfire;
+using Hangfire.States;
+using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,16 +17,30 @@ namespace LatestExchangeRate.Controllers
 
         [HttpGet]
         [Route("latestexchangerate")]
-        public ActionResult LatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
+        public ActionResult<OperationResponse> LatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
         {
             if (fixerRestClientRequest == null)
             {
                 throw new Exception("Null Req");
             }
 
-            _jobScheduler.EnqueueGetLatestExchangeRate(fixerRestClientRequest);
+            var jobId = _jobScheduler.EnqueueGetLatestExchangeRate(fixerRestClientRequest);
+            var connection = JobStorage.Current.GetConnection();
+            var stateData = connection.GetStateData(jobId);
+            var operationResponse = new OperationResponse();
 
-            return Ok();
+            if (stateData.Name == EnqueuedState.StateName)
+            {
+                // The job was successfully scheduled
+                operationResponse.Success = true;
+                return Ok(operationResponse);
+            }
+            else
+            {
+                // The job was not successfully scheduled
+                operationResponse.Success = false;
+                return BadRequest(operationResponse);
+            }
         }
     }
 }

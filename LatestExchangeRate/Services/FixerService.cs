@@ -5,6 +5,7 @@ using LatestExchangeRate.Models;
 using LatestExchangeRate.Context;
 using Newtonsoft.Json;
 using RestSharp;
+using Hangfire;
 
 namespace LatestExchangeRate.Services
 {
@@ -17,12 +18,12 @@ namespace LatestExchangeRate.Services
             _context = context;
         }
 
-        public FixerRestClientResponse GetLatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
+        public void GetLatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
         {
             if (fixerRestClientRequest == null)
             {
                 throw new Exception("...");
-            }  
+            }
 
             var client = new RestClient(RestClientConstants.BaseURL);
             var request = new RestRequest(RestClientConstants.LatestRateEndpoint, Method.Get);
@@ -37,7 +38,6 @@ namespace LatestExchangeRate.Services
             var result = JsonConvert.DeserializeObject<FixerRestClientResponse>(jsonResponse);
 
             SaveResponseToDatabase(result);
-            return result;
         }
 
         public void SaveResponseToDatabase(FixerRestClientResponse response)

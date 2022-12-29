@@ -13,9 +13,11 @@ namespace LatestExchangeRate.Services
             _fixerService = fixerService;
         }
 
-        public void EnqueueGetLatestExchangeRate(FixerRestClientRequest request)
+        public string EnqueueGetLatestExchangeRate(FixerRestClientRequest request)
         {
-            RecurringJob.AddOrUpdate<IExchangeRate>(x => x.GetLatestExchangeRate(request), "*/10 * * * *");
+            var jobId = BackgroundJob.Enqueue(() => _fixerService.GetLatestExchangeRate(request));
+
+            return jobId;
         }
     }
 }
