@@ -13,10 +13,12 @@ namespace LatestExchangeRate.Services
     public class FixerService : IExchangeRate
     {
         private readonly AppDbContext _context;
+        private readonly RabbitMqService _rabbitMqService;
 
-        public FixerService(AppDbContext context)
+        public FixerService(AppDbContext context, RabbitMqService rabbitMqService)
         {
             _context = context;
+            _rabbitMqService = rabbitMqService;
         }
 
         public void GetLatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
@@ -38,6 +40,7 @@ namespace LatestExchangeRate.Services
                     var result = JsonConvert.DeserializeObject<FixerRestClientResponse>(jsonResponse);
 
                     SaveResponseToDatabase(result);
+                    _rabbitMqService.SendMessage(result);
                 }
                 else
                 {
@@ -46,7 +49,7 @@ namespace LatestExchangeRate.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error making request to RestClient. Status code: {ex.Message}");
+                throw new Exception($"Error making request to RestClient. Exception message: {ex.Message}");
             }
         }
 

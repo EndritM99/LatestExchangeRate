@@ -4,6 +4,7 @@ using LatestExchangeRate.Context;
 using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Services;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,9 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(buil
 // Add dependencies here
 builder.Services.AddScoped<IJobScheduler, JobScheduler>();
 builder.Services.AddScoped<IExchangeRate, FixerService>();
+builder.Services.AddScoped<IDocumentProcessing, DocumentProcessingService>();
+builder.Services.AddScoped<IRabbitMq, RabbitMqService>();
+builder.Services.AddSingleton(new ConnectionFactory() { HostName = "localhost" });
 
 var app = builder.Build();
 
