@@ -48,6 +48,7 @@ namespace LatestExchangeRate.Services
                 };
 
                 channel.BasicConsume(queue: "Queue exchange-rate-response-queue", autoAck: true, consumer: consumer);
+
                 return response;
             }
         }
