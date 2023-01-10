@@ -2,6 +2,7 @@
 using Hangfire.States;
 using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Models;
+using LatestExchangeRate.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LatestExchangeRate.Controllers
@@ -9,10 +10,12 @@ namespace LatestExchangeRate.Controllers
     public class FixerController : Controller
     {
         private readonly IJobScheduler _jobScheduler;
+        private readonly JobValidator _jobValidator;
 
-        public FixerController(IJobScheduler jobScheduler)
+        public FixerController(IJobScheduler jobScheduler, JobValidator jobValidator)
         {
             _jobScheduler = jobScheduler;
+            _jobValidator = jobValidator;
         }
 
         [HttpGet]
@@ -28,31 +31,16 @@ namespace LatestExchangeRate.Controllers
             {
                 var jobId = _jobScheduler.EnqueueGetLatestExchangeRate(fixerRestClientRequest);
 
-                if (string.IsNullOrEmpty(jobId))
-                {
-                    return BadRequest("Error scheduling job: job ID was null or empty");
-                }
-
-                var connection = JobStorage.Current.GetConnection();
-                var stateData = connection.GetStateData(jobId);
                 var operationResponse = new OperationResponse();
 
-                if (stateData.Name == EnqueuedState.StateName)
+                if (_jobValidator.DoesJobHasBeenEnqueued(jobId))
                 {
                     // The job was successfully scheduled
                     operationResponse.Success = true;
-                    _jobScheduler.EnqueueWriteResponseToFile();
 
                     var writeJobId = _jobScheduler.EnqueueWriteResponseToFile();
 
-                    if (string.IsNullOrEmpty(writeJobId))
-                    {
-                        return BadRequest("Error scheduling write job: job ID was null or empty");
-                    }
-
-                    var writeStateData = connection.GetStateData(writeJobId);
-
-                    if (writeStateData.Name == EnqueuedState.StateName)
+                    if (_jobValidator.DoesJobHasBeenEnqueued(writeJobId))
                     {
                         // The write job was successfully scheduled
                         operationResponse.Success = true;
@@ -77,6 +65,5 @@ namespace LatestExchangeRate.Controllers
                 return BadRequest($"Error scheduling job: {ex.Message}");
             }
         }
-
     }
 }
