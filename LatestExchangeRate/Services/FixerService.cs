@@ -13,9 +13,9 @@ namespace LatestExchangeRate.Services
     public class FixerService : IExchangeRate
     {
         private readonly AppDbContext _context;
-        private readonly RabbitMqService _rabbitMqService;
+        private readonly IRabbitMq _rabbitMqService;
 
-        public FixerService(AppDbContext context, RabbitMqService rabbitMqService)
+        public FixerService(AppDbContext context, IRabbitMq rabbitMqService)
         {
             _context = context;
             _rabbitMqService = rabbitMqService;

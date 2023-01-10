@@ -9,9 +9,9 @@ namespace LatestExchangeRate.Services
 {
     public class DocumentProcessingService : IDocumentProcessing
     {
-        private readonly RabbitMqService _rabbitMqServicer;
+        private readonly IRabbitMq _rabbitMqServicer;
 
-        public DocumentProcessingService(RabbitMqService rabbitMqServicer)
+        public DocumentProcessingService(IRabbitMq rabbitMqServicer)
         {
             _rabbitMqServicer = rabbitMqServicer;
         }
@@ -22,7 +22,7 @@ namespace LatestExchangeRate.Services
             {
                 var response = GetFixerRestClientResponse();
 
-                string filePath = @"C:\Users\endri\Desktop\GitHub Repos\LatestExchangeRate\LatestExchangeRate\DocumentStorage\FixerResponseTESTingAGAIN.docx";
+                string filePath = @"C:\Users\endri\Desktop\GitHub Repos\LatestExchangeRate\LatestExchangeRate\DocumentStorage\FixerResponseTESTingAGAINFF.docx";
 
                 using (WordprocessingDocument myDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
                 {
