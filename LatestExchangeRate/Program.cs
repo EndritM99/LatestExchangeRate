@@ -3,6 +3,7 @@ using Hangfire.SqlServer;
 using LatestExchangeRate.Context;
 using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Services;
+using LatestExchangeRate.Validators;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IExchangeRate, FixerService>();
 builder.Services.AddScoped<IDocumentProcessing, DocumentProcessingService>();
 builder.Services.AddScoped<IRabbitMq, RabbitMqService>();
 builder.Services.AddSingleton(new ConnectionFactory() { HostName = "localhost" });
+builder.Services.AddScoped<JobValidator>();
 
 var app = builder.Build();
 
