@@ -5,6 +5,8 @@ using LatestExchangeRate.Constans;
 using LatestExchangeRate.Models;
 using Azure;
 using Newtonsoft.Json;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace LatestExchangeRate.Services
 {
@@ -23,19 +25,26 @@ namespace LatestExchangeRate.Services
 
         public FixerRestClientResponse ReadMessage()
         {
-            var consumer = new AsyncEventingBasicConsumer(_model);
             FixerRestClientResponse response = null;
-
-            consumer.Received += async (ch, ea) =>
+            while (response == null)
             {
-                var body = ea.Body.ToArray();
-                var text = System.Text.Encoding.UTF8.GetString(body);
-
-                response = JsonConvert.DeserializeObject<FixerRestClientResponse>(text);
-                _model.BasicAck(ea.DeliveryTag, false);
-            };
-            _model.BasicConsume(RestClientConstants.QueueName, false, consumer);
-
+                var queueDeclareOk = _model.QueueDeclarePassive(RestClientConstants.QueueName);
+                if (queueDeclareOk.MessageCount > 0)
+                {
+                    var basicGetResult = _model.BasicGet(RestClientConstants.QueueName, true);
+                    if (basicGetResult == null)
+                        continue;
+                    var body = basicGetResult.Body.ToArray();
+                    var text = System.Text.
+                    Encoding.UTF8.GetString(body);
+                    response = JsonConvert.DeserializeObject<FixerRestClientResponse>(text);
+                    _model.BasicAck(basicGetResult.DeliveryTag, false);
+                }
+                else
+                {   
+                    Thread.Sleep(1000);
+                }
+            }
             return response;
         }
 

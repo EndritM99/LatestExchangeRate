@@ -22,13 +22,19 @@ namespace LatestExchangeRate.Services
             using var connection = _rabbitMqService.CreateChannel();
             using var model = connection.CreateModel();
 
-            string message = JsonConvert.SerializeObject(fixerRestClientResponse);
+            model.ConfirmSelect();
 
+            string message = JsonConvert.SerializeObject(fixerRestClientResponse);
             var body = Encoding.UTF8.GetBytes(message);
-            model.BasicPublish(RestClientConstants.QueueName,
-                                 string.Empty,
-                                 basicProperties: null,
-                                 body: body);
+            var basicProperties = model.CreateBasicProperties();
+            basicProperties.Persistent = true;
+            model.BasicPublish("ExchangeRate", string.Empty, basicProperties, body);
+
+            if (!model.WaitForConfirms())
+            {
+                throw new Exception("The message could not be confirmed to be written to the disk of the message broker");
+            }
         }
+
     }
 }
