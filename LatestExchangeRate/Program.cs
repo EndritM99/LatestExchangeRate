@@ -2,15 +2,18 @@ using Hangfire;
 using Hangfire.SqlServer;
 using LatestExchangeRate.Context;
 using LatestExchangeRate.Interfaces;
+using LatestExchangeRate.Models;
 using LatestExchangeRate.Services;
 using LatestExchangeRate.Validators;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,6 +32,8 @@ builder.Services.AddHangfire(configuration => configuration
         DisableGlobalLocks = true
     }));
 
+builder.Services.Configure<RabbitMqConfiguration>(a => builder.Configuration.GetSection(nameof(RabbitMqConfiguration)).Bind(a));
+
 // Add the processing server as IHostedService
 builder.Services.AddHangfireServer();
 
@@ -38,9 +43,12 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(buil
 builder.Services.AddScoped<IJobScheduler, JobScheduler>();
 builder.Services.AddScoped<IExchangeRate, FixerService>();
 builder.Services.AddScoped<IDocumentProcessing, DocumentProcessingService>();
-builder.Services.AddScoped<IRabbitMq, RabbitMqService>();
+//builder.Services.AddScoped<IRabbitMq, RabbitMqService>();
 builder.Services.AddSingleton(new ConnectionFactory() { HostName = "localhost" });
 builder.Services.AddScoped<JobValidator>();
+builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+builder.Services.AddSingleton<IConsumerService, ConsumerService>();
+builder.Services.AddSingleton<IResponsePublisher, ResponsePublisher>();
 
 var app = builder.Build();
 

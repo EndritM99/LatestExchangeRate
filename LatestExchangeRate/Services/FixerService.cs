@@ -13,12 +13,12 @@ namespace LatestExchangeRate.Services
     public class FixerService : IExchangeRate
     {
         private readonly AppDbContext _context;
-        private readonly IRabbitMq _rabbitMqService;
+        private readonly IResponsePublisher _responsePublisher;
 
-        public FixerService(AppDbContext context, IRabbitMq rabbitMqService)
+        public FixerService(AppDbContext context, IResponsePublisher responsePublisher)
         {
             _context = context;
-            _rabbitMqService = rabbitMqService;
+            _responsePublisher = responsePublisher;
         }
 
         public void GetLatestExchangeRate(FixerRestClientRequest fixerRestClientRequest)
@@ -40,7 +40,7 @@ namespace LatestExchangeRate.Services
                     var result = JsonConvert.DeserializeObject<FixerRestClientResponse>(jsonResponse);
 
                     SaveResponseToDatabase(result);
-                    _rabbitMqService.SendMessage(result);
+                    _responsePublisher.SendMessage(result);
                 }
                 else
                 {
