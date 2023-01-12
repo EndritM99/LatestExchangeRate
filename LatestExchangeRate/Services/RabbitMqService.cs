@@ -4,53 +4,30 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client;
 using System.Text;
 using LatestExchangeRate.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace LatestExchangeRate.Services
 {
-    public class RabbitMqService : IRabbitMq
+    public class RabbitMqService : IRabbitMqService
     {
-        private readonly ConnectionFactory _factory;
-        private IConnection _connection;
-
-        public RabbitMqService(ConnectionFactory factory)
+        private readonly RabbitMqConfiguration _configuration;
+        public RabbitMqService(IOptions<RabbitMqConfiguration> options)
         {
-            _factory = factory;
-            _connection = _factory.CreateConnection();
+            _configuration = options.Value;
         }
-
-        public void SendMessage(FixerRestClientResponse response)
+        public IConnection CreateChannel()
         {
-            using (var channel = _connection.CreateModel())
+            ConnectionFactory connection = new ConnectionFactory()
             {
-                channel.QueueDeclare(queue: "Queue exchange-rate-response-queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+                UserName = _configuration.Username,
+                Password = _configuration.Password,
+                HostName = _configuration.HostName
+            };
 
-                string message = JsonConvert.SerializeObject(response);
-                var body = Encoding.UTF8.GetBytes(message);
+            connection.DispatchConsumersAsync = true;
+            var channel = connection.CreateConnection();
 
-                channel.BasicPublish(exchange: "", routingKey: "Queue exchange-rate-response-queue", basicProperties: null, body: body);
-            }
-        }
-
-        public FixerRestClientResponse ReceiveMessage()
-        {
-            using (var channel = _connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: "Queue exchange-rate-response-queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-
-                var consumer = new EventingBasicConsumer(channel);
-                FixerRestClientResponse response = null;
-
-                consumer.Received += (model, ea) =>
-                {
-                    var body = ea.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    response = JsonConvert.DeserializeObject<FixerRestClientResponse>(message);
-                };
-
-                channel.BasicConsume(queue: "Queue exchange-rate-response-queue", autoAck: true, consumer: consumer);
-
-                return response;
-            }
+            return channel;
         }
     }
 }

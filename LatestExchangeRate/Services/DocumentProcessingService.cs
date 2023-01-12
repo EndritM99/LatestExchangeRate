@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using LatestExchangeRate.Constans;
 using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Models;
 using Newtonsoft.Json;
@@ -9,11 +10,11 @@ namespace LatestExchangeRate.Services
 {
     public class DocumentProcessingService : IDocumentProcessing
     {
-        private readonly IRabbitMq _rabbitMqServicer;
+        private readonly IConsumerService _consumerService;
 
-        public DocumentProcessingService(IRabbitMq rabbitMqServicer)
+        public DocumentProcessingService(IConsumerService consumerService)
         {
-            _rabbitMqServicer = rabbitMqServicer;
+            _consumerService = consumerService;
         }
 
         public void WriteResponseToFile()
@@ -22,7 +23,7 @@ namespace LatestExchangeRate.Services
             {
                 var response = GetFixerRestClientResponse();
 
-                string filePath = @"C:\Users\endri\Desktop\GitHub Repos\LatestExchangeRate\LatestExchangeRate\DocumentStorage\FixerResponseTESTingAGAINFF.docx";
+                string filePath = RestClientConstants.FilePathOfDocument;
 
                 using (WordprocessingDocument myDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
                 {
@@ -53,7 +54,7 @@ namespace LatestExchangeRate.Services
 
         private FixerRestClientResponse GetFixerRestClientResponse() 
         {
-            var response = _rabbitMqServicer.ReceiveMessage();
+            var response = _consumerService.ReadMessage();
 
             return response;
         }
