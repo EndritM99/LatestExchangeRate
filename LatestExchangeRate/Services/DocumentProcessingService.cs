@@ -22,28 +22,69 @@ namespace LatestExchangeRate.Services
             try
             {
                 var response = GetFixerRestClientResponse();
-
                 string filePath = RestClientConstants.FilePathOfDocument;
 
                 using (WordprocessingDocument myDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
                 {
                     MainDocumentPart mainDocumentPart = myDocument.AddMainDocumentPart();
-
                     mainDocumentPart.Document = new Document();
                     Body body = mainDocumentPart.Document.AppendChild(new Body());
-                    Paragraph paragraph = body.AppendChild(new Paragraph());
-                    Run run = paragraph.AppendChild(new Run());
-                    Run run1 = paragraph.AppendChild(new Run());
 
-                    //ApplyStyleToParagraph(myDocument, "OverdueAmount", "Overdue Amount", p);
+                    Paragraph p = new Paragraph();
+                    
+                    ParagraphProperties pp = new ParagraphProperties();
+                    pp.Justification = new Justification() { Val = JustificationValues.Center };
+                    p.AppendChild(pp);
 
-                    string responseString = JsonConvert.SerializeObject(response);
-                    Text text = new Text(responseString);
+                    Run r = new Run();
+                    
+                    RunProperties rp = new RunProperties();
+                    rp.FontSize = new FontSize() { Val = "28" };
+                    r.AppendChild(rp);
+                    r.AppendChild(new Text("Latest Exchange Rate"));
+                    p.AppendChild(r);
+                    body.AppendChild(p);
 
-                    run.AppendChild(text);
-                    run.AppendChild(new Text("Hello, World! Test"));
-                    run.AppendChild(new Text("Hello, World! Test"));
-                    run1.AppendChild(new Text("Hello, World! Testing"));
+                    Paragraph paragraph = new Paragraph();
+                    Run run = new Run();
+                    var date = response.Date.ToString("yyyy-MM-dd");
+                    var textDate = $"This information has been fetch from Fixer API at {date}";
+                    run.AppendChild(new Text(textDate));
+                    paragraph.AppendChild(run);
+                    body.AppendChild(paragraph);
+
+                    var table = new Table();
+                    var tableProperties = new TableProperties();
+                    var tableWidth = new TableWidth() { Width = "0", Type = TableWidthUnitValues.Auto };
+                    tableProperties.Append(tableWidth);
+                    table.AppendChild(tableProperties);
+
+                    foreach (var item in response.Rates)
+                    {
+                        var tr = new TableRow();
+                        var tc1 = new TableCell();
+                        var tc2 = new TableCell();
+
+                        var p1 = new Paragraph();
+                        var r1 = new Run();
+                        var t1 = new Text(item.Key);
+                        r1.AppendChild(t1);
+                        p1.AppendChild(r1);
+                        tc1.AppendChild(p1);
+
+                        var p2 = new Paragraph();
+                        var r2 = new Run();
+                        var t2 = new Text(item.Value.ToString());
+                        r2.AppendChild(t2);
+
+                        p2.AppendChild(r2);
+                        tc2.AppendChild(p2);
+
+                        tr.AppendChild(tc1);
+                        tr.AppendChild(tc2);
+                        table.AppendChild(tr);
+                    }
+                    body.AppendChild(table);
                 }
             }
             catch (Exception ex)

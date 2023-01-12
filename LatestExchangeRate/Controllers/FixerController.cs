@@ -1,6 +1,4 @@
-﻿using Hangfire;
-using Hangfire.States;
-using LatestExchangeRate.Interfaces;
+﻿using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Models;
 using LatestExchangeRate.Validators;
 using Microsoft.AspNetCore.Mvc;
@@ -35,27 +33,23 @@ namespace LatestExchangeRate.Controllers
 
                 if (_jobValidator.DoesJobHasBeenEnqueued(jobId))
                 {
-                    // The job was successfully scheduled
                     operationResponse.Success = true;
 
                     var writeJobId = _jobScheduler.EnqueueWriteResponseToFile();
 
                     if (_jobValidator.DoesJobHasBeenEnqueued(writeJobId))
                     {
-                        // The write job was successfully scheduled
                         operationResponse.Success = true;
                         return Ok(operationResponse);
                     }
                     else
                     {
-                        // The write job was not successfully scheduled
                         operationResponse.Success = false;
                         return BadRequest(operationResponse);
                     }
                 }
                 else
                 {
-                    // The job was not successfully scheduled
                     operationResponse.Success = false;
                     return BadRequest(operationResponse);
                 }
