@@ -1,16 +1,12 @@
-﻿using LatestExchangeRate.Interfaces;
-using RabbitMQ.Client.Events;
-using RabbitMQ.Client;
-using LatestExchangeRate.Constans;
+﻿using LatestExchangeRate.Constans;
+using LatestExchangeRate.Interfaces;
 using LatestExchangeRate.Models;
-using Azure;
 using Newtonsoft.Json;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.EMMA;
+using RabbitMQ.Client;
 
 namespace LatestExchangeRate.Services
 {
-    public class ConsumerService : IConsumerService, IDisposable
+    public class ConsumerService : IConsumerService
     {
         private readonly IModel _model;
         private readonly IConnection _connection;
@@ -35,8 +31,7 @@ namespace LatestExchangeRate.Services
                     if (basicGetResult == null)
                         continue;
                     var body = basicGetResult.Body.ToArray();
-                    var text = System.Text.
-                    Encoding.UTF8.GetString(body);
+                    var text = System.Text.Encoding.UTF8.GetString(body);
                     response = JsonConvert.DeserializeObject<FixerRestClientResponse>(text);
                     _model.BasicAck(basicGetResult.DeliveryTag, false);
                 }
@@ -46,14 +41,6 @@ namespace LatestExchangeRate.Services
                 }
             }
             return response;
-        }
-
-        public void Dispose()
-        {
-            if (_model.IsOpen)
-                _model.Close();
-            if (_connection.IsOpen)
-                _connection.Close();
         }
     }
 }
