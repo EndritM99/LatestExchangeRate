@@ -7,6 +7,6 @@
         public const string DefalutBase = "EUR";
         public const string LatestRateEndpoint = "latest";
         public const string QueueName = "exchange-rate-response-queue";
-        public const string FilePathOfDocument = @"C:\Users\endri\Desktop\GitHub Repos\LatestExchangeRate\LatestExchangeRate\DocumentStorage\FixerResponseTESTingAGAINFF.docx";
+        public const string FilePathOfDocument = @"C:\Users\endri\Desktop\GitHub Repos\LatestExchangeRate\LatestExchangeRate\DocumentStorage\LatestExchangeRates.docx";
     }
 }
