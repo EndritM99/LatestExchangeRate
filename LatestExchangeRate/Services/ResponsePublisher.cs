@@ -35,6 +35,5 @@ namespace LatestExchangeRate.Services
                 throw new Exception("The message could not be confirmed to be written to the disk of the message broker");
             }
         }
-
     }
 }

@@ -45,6 +45,13 @@ namespace LatestExchangeRate.Services
                     p.AppendChild(r);
                     body.AppendChild(p);
 
+                    Paragraph paragraph = new Paragraph();
+                    Run run = new Run();
+                    var date = response.Date.ToString("yyyy-MM-dd");
+                    var textDate = $"This information has been fetch from Fixer API at {date}";
+                    run.AppendChild(new Text(textDate));
+                    paragraph.AppendChild(run);
+                    body.AppendChild(paragraph);
 
                     var table = new Table();
                     var tableProperties = new TableProperties();
@@ -85,7 +92,6 @@ namespace LatestExchangeRate.Services
                 throw new Exception($"Error writing response to file: {ex.Message}");
             }
         }
-
 
         private FixerRestClientResponse GetFixerRestClientResponse() 
         {
