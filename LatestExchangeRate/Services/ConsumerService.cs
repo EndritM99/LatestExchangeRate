@@ -33,7 +33,7 @@ namespace LatestExchangeRate.Services
                     var body = basicGetResult.Body.ToArray();
                     var text = System.Text.Encoding.UTF8.GetString(body);
                     response = JsonConvert.DeserializeObject<FixerRestClientResponse>(text);
-                    _model.BasicAck(basicGetResult.DeliveryTag, false);
+                    //_model.BasicAck(basicGetResult.DeliveryTag, false);
                 }
                 else
                 {   
